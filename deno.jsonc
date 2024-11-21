@@ -1,0 +1,11 @@
+{
+    "tasks": {
+        "start": "deno run --allow-net --allow-read --allow-env main.ts",
+        "start:dev": "deno run --allow-net --allow-read --allow-env --watch main.ts"
+    },
+    "imports": {
+        "@std/dotenv": "jsr:@std/dotenv@^0.225.2",
+        "axios": "npm:axios@^1.7.7",
+        "telegraf": "npm:telegraf@^4.16.3"
+    }
+}
