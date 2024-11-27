@@ -22,7 +22,11 @@ const numberFormatter = Intl.NumberFormat("en", {
 // Regular expression for Solana address (base58 string of length 32-44)
 const solanaAddressRegex = /[1-9A-HJ-NP-Za-km-z]{32,44}/;
 
-const spacer = "  •  ";
+const escapeMarkdown = (text: string) => {
+  return text.replace(/([_*[\]()~`>#+\-=|{}.!])/g, "\\$1");
+};
+
+const spacer = "  ";
 
 bot.hears(solanaAddressRegex, async (ctx) => {
   try {
@@ -30,17 +34,19 @@ bot.hears(solanaAddressRegex, async (ctx) => {
     const address = ctx.message.text.match(solanaAddressRegex)![0];
 
     const links1 = [
-      `[🪐 JUP](https://jup.ag/swap/SOL-${address})`,
+      `[🪐 JUP](${`https://jup.ag/swap/SOL-${address}`})`,
     ];
 
     if (address.endsWith("pump")) {
-      links1.unshift(`[💊 PUMP](https://pump.fun/coin/${address})`);
+      links1.unshift(
+        `[💊 PUMP](${`https://pump.fun/coin/${address}`})`,
+      );
     }
 
     const links2 = [
-      `[🦅 DEXS](https://dexscreener.com/solana/${address})`,
-      `[🛠️ DEXT](https://www.dextools.io/app/en/solana/pair-explorer/${address})`,
-      `[🐊 GMGN](https://gmgn.ai/sol/token/${address})`,
+      `[🦅 DEXS](${`https://dexscreener.com/solana/${address}`})`,
+      `[🛠️ DEXT](${`https://www.dextools.io/app/en/solana/pair-explorer/${address}`})`,
+      `[🐊 GMGN](${`https://gmgn.ai/sol/token/${address}`})`,
     ];
 
     const response = await dexscreener.get(`/latest/dex/tokens/${address}`);
@@ -65,12 +71,14 @@ bot.hears(solanaAddressRegex, async (ctx) => {
     }
 
     const sections = [
-      `\`${address}\`\n`,
-      `Quick links™${spacer}${links1.join(spacer)}\n${links2.join(spacer)}`,
       `${baseToken.name} [$${baseToken.symbol}]:`,
-      `Market Cap: $${numberFormatter.format(pair.marketCap)}`,
+      `Market Cap: $${escapeMarkdown(numberFormatter.format(pair.marketCap))}`,
+      `\n\`${address}\`\n`,
+      `Quick links™${spacer}${links1.join(spacer)}\n${links2.join(spacer)}\n`,
       tokenLinks.join(spacer),
     ];
+
+    console.log(sections.join("\n"));
 
     await ctx.reply(`${sections.join("\n")}`, {
       parse_mode: "MarkdownV2",
