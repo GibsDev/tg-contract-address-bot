@@ -43,17 +43,6 @@ bot.hears(solanaAddressRegex, async (ctx) => {
       `<a href="https://gmgn.ai/sol/token/${address}">🐊 GMGN</a>`,
     ];
 
-    ctx.reply(
-      `Quick links™${spacer}${links1.join(spacer)}\n${links2.join(spacer)}`,
-      {
-        parse_mode: "HTML",
-        link_preview_options: { is_disabled: true },
-        reply_parameters: {
-          message_id: ctx.message.message_id,
-        },
-      },
-    );
-
     const response = await dexscreener.get(`/latest/dex/tokens/${address}`);
 
     if (!response?.data?.pairs) {
@@ -76,15 +65,20 @@ bot.hears(solanaAddressRegex, async (ctx) => {
     }
 
     const sections = [
+      `Quick links™${spacer}${links1.join(spacer)}\n${links2.join(spacer)}`,
       `${baseToken.name} [$${baseToken.symbol}]:`,
       `Market Cap: $${numberFormatter.format(pair.marketCap)}`,
       tokenLinks.join(spacer),
     ];
 
-    ctx.reply(`${sections.join("\n")}`, {
+    await ctx.reply(`${sections.join("\n")}`, {
       parse_mode: "HTML",
       link_preview_options: { is_disabled: true },
     });
+
+    // Send the isolated contract address for lazy mobile nerds
+    ctx.reply(address);
+    
   } catch (e) {
     ctx.reply(
       `\`\`\`\nError: ${
@@ -103,5 +97,5 @@ bot.hears(solanaAddressRegex, async (ctx) => {
 bot.launch();
 
 // Enable graceful stop
-Deno.addSignalListener("SIGINT", () => bot.stop("SIGINT"));
-Deno.addSignalListener("SIGTERM", () => bot.stop("SIGTERM"));
+// Deno.addSignalListener("SIGINT", () => bot.stop("SIGINT"));
+// Deno.addSignalListener("SIGTERM", () => bot.stop("SIGTERM"));
