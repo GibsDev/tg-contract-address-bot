@@ -30,17 +30,17 @@ bot.hears(solanaAddressRegex, async (ctx) => {
     const address = ctx.message.text.match(solanaAddressRegex)![0];
 
     const links1 = [
-      `<a href="https://jup.ag/swap/SOL-${address}">🪐 JUP</a>`,
+      `[🪐 JUP](https://jup.ag/swap/SOL-${address})`,
     ];
 
     if (address.endsWith("pump")) {
-      links1.unshift(`<a href="https://pump.fun/coin/${address}">💊 PUMP</a>`);
+      links1.unshift(`[💊 PUMP](https://pump.fun/coin/${address})`);
     }
 
     const links2 = [
-      `<a href="https://dexscreener.com/solana/${address}">🦅 DEXS</a>`,
-      `<a href="https://www.dextools.io/app/en/solana/pair-explorer/${address}">🛠️ DEXT</a>`,
-      `<a href="https://gmgn.ai/sol/token/${address}">🐊 GMGN</a>`,
+      `[🦅 DEXS](https://dexscreener.com/solana/${address})`,
+      `[🛠️ DEXT](https://www.dextools.io/app/en/solana/pair-explorer/${address})`,
+      `[🐊 GMGN](https://gmgn.ai/sol/token/${address})`,
     ];
 
     const response = await dexscreener.get(`/latest/dex/tokens/${address}`);
@@ -57,14 +57,15 @@ bot.hears(solanaAddressRegex, async (ctx) => {
     const tokenLinks = new Array<string>();
 
     for (const website of info?.websites || []) {
-      tokenLinks.push(`<a href="${website.url}">${website.label}</a>`);
+      tokenLinks.push(`[${website.label}](${website.url})`);
     }
 
     for (const social of info?.socials || []) {
-      tokenLinks.push(`<a href="${social.url}">${social.type}</a>`);
+      tokenLinks.push(`[${social.type}](${social.url})`);
     }
 
     const sections = [
+      `\`${address}\`\n`,
       `Quick links™${spacer}${links1.join(spacer)}\n${links2.join(spacer)}`,
       `${baseToken.name} [$${baseToken.symbol}]:`,
       `Market Cap: $${numberFormatter.format(pair.marketCap)}`,
@@ -72,13 +73,10 @@ bot.hears(solanaAddressRegex, async (ctx) => {
     ];
 
     await ctx.reply(`${sections.join("\n")}`, {
-      parse_mode: "HTML",
+      parse_mode: "MarkdownV2",
       link_preview_options: { is_disabled: true },
     });
 
-    // Send the isolated contract address for lazy mobile nerds
-    ctx.reply(address);
-    
   } catch (e) {
     ctx.reply(
       `\`\`\`\nError: ${
